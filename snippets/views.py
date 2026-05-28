@@ -188,3 +188,16 @@ class SnippetDetail1(mixins.RetrieveModelMixin, mixins.UpdateModelMixin, mixins.
         return self.update(request, *args, **kwargs)
     def delete(self, request, *args, **kwargs):
         return self.destroy(request, *args, **kwargs)
+
+# 基于泛型的视图， 预定义的混合视图
+from snippets.models import Snippet
+from snippets.serializers1 import SnippetSerializer
+from rest_framework import generics
+
+class SnippetList2(generics.ListCreateAPIView):
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
+
+class SnippetDetail2(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Snippet.objects.all()
+    serializer_class = SnippetSerializer
