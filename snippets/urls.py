@@ -16,6 +16,9 @@ urlpatterns = [
     # 使用预定义的混合视图
     path("snippets3/", views.SnippetList2.as_view()),
     path("snippets3/<int:pk>", views.SnippetDetail2.as_view()),
+    # 认证与权限管理
+    path("user/", views.UserList.as_view()),
+    path("user/<int:pk>", views.UserDetail.as_view()),
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

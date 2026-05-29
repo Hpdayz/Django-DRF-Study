@@ -201,3 +201,15 @@ class SnippetList2(generics.ListCreateAPIView):
 class SnippetDetail2(generics.RetrieveUpdateDestroyAPIView):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
+
+
+# step 4: 认证与权限管理
+from django.contrib.auth.models import User
+from snippets.serializers1 import UserSerializer
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
