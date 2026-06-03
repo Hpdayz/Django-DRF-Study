@@ -40,6 +40,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'quickstart',
     'snippets',
+    'app01_认证'
 ]
 
 MIDDLEWARE = [
