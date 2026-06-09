@@ -169,6 +169,19 @@ wheels = [
 ]
 
 [[package]]
+name = "django-redis"
+version = "5.4.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "django" },
+    { name = "redis" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/83/9d/2272742fdd9d0a9f0b28cd995b0539430c9467a2192e4de2cea9ea6ad38c/django-redis-5.4.0.tar.gz", hash = "sha256:6a02abaa34b0fea8bf9b707d2c363ab6adc7409950b2db93602e6cb292818c42", size = 52567, upload-time = "2023-10-01T20:22:01.221Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/b7/f1/63caad7c9222c26a62082f4f777de26389233b7574629996098bf6d25a4d/django_redis-5.4.0-py3-none-any.whl", hash = "sha256:ebc88df7da810732e2af9987f7f426c96204bf89319df4c6da6ca9a2942edd5b", size = 31119, upload-time = "2023-10-01T20:21:33.009Z" },
+]
+
+[[package]]
 name = "djangorestframework"
 version = "3.12.0"
 source = { registry = "https://pypi.org/simple" }
@@ -187,6 +200,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "celery", extra = ["redis"] },
     { name = "django" },
+    { name = "django-redis" },
     { name = "djangorestframework" },
     { name = "pygments" },
 ]
@@ -195,6 +209,7 @@ dependencies = [
 requires-dist = [
     { name = "celery", extras = ["redis"], specifier = ">=5.3" },
     { name = "django", specifier = "==3.2" },
+    { name = "django-redis", specifier = ">=5.3" },
     { name = "djangorestframework", specifier = "==3.12.0" },
     { name = "pygments", specifier = "==2.20.0" },
 ]

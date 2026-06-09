@@ -88,7 +88,7 @@ print(request.v3)
     - drf 请求流程
 
     - 请求参数
-        *args, **kwargs
+        *, args**kwargs
         v1, v2, v3
 
 ## 认证组件

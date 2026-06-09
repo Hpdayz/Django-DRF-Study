@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'quickstart',
     'snippets',
-    'app01_认证'
+    'app01_认证',
+    'threatbook',
 ]
 
 MIDDLEWARE = [
@@ -127,7 +128,6 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
 
 # DRF 接口配置
 REST_FRAMEWORK = {
