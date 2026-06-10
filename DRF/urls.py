@@ -29,6 +29,7 @@ urlpatterns = [
     path('api-auth', include('rest_framework.urls', namespace='rest_framework')),
     path('', include('snippets.urls', namespace='Snippets')),
     path('', include('app01_认证.urls', namespace='app01')),
+    path('', include('app02_权限.urls', namespace='app02')),
     path('', include('threatbook.urls', namespace='threatbook')),
 ]
 

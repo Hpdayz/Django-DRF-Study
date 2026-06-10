@@ -86,7 +86,7 @@ request.v2()
 print(request.v3)
 ```
     - drf 请求流程
-
+    
     - 请求参数
         *, args**kwargs
         v1, v2, v3
@@ -168,3 +168,38 @@ class C2(C1):
     - 实现
         - 编写类 -> 认证组件
         - 应用组件（局部）
+    应用场景： 经理角色、当前订单是他手下创建
+    默认权限组件：必须满足[A条件、B条件、… ]
+    
+    整改：满足任意条件：A条件、B条件、C条件 … 
+        - 覆写 check_permissions
+        - 扩展 可以重写一个 NewView
+            class NewView(APIView)
+                def check_permissions(self, request):
+                    pass
+            在视图函数中继承 NewView, 而不继承 APIView
+            class OrderView(NewView):
+                pass
+            这样可以复用
+## 案例： 用户登录+用户认证+角色+扩展案例
+    参考 AvatarView(NewView)
+## 思考
+    -开发过程中，发现drf中的request对象不好用，换成另外一个request实例对象，怎么换？
+        dispatch -> initalize_request -> Request  覆写 initalize_request
+    -drf中的认证、权限组件与django中的中间件有什么关系？
+
+![image-20260609161319497](README.assets/image-20260609161319497.png)
+
+## 限流组件
+    开发过程中，某个接口不希望用户访问过于频繁，限流机制，例如：平台显示1小时发送10次、IP限制、验证码、防止爬虫
+    限制访问频率：
+        -已登录用户，用户信息主键、ID、用户名
+        -未登录，IP为唯一标识
+    如何限制？ eg：10分钟3次
+        "001": ["17:00","16:55","16:53"]
+        1.获取当前访问时间 17:00
+        2.当前时间-10分钟=计时开始时间 16:50
+        3.删除小于16:50的时间
+        4.计算当前记录的数组长度
+            - 超过，报错
+            - 未超过，可访问

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'quickstart',
     'snippets',
     'app01_认证',
+    'app02_权限',
     'threatbook',
 ]
 
