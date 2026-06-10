@@ -104,7 +104,7 @@ print(request.v3)
             - 编写类 -> 认证组件
             - 应用组件（全局）
             REST_FRAMEWORK= {
-                "UNAUTHENTICATED_USER": None
+                "UNAUTHENTICATED_USER": None,
                 "DEFAULT_AUTHENTICATION_CLASSES": ["app01_认证.views.MyAuthentication"]
             }
         在 drf 中，先从全局中找，再从局部中找

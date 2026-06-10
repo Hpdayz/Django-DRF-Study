@@ -40,9 +40,8 @@ INSTALLED_APPS = [
     'rest_framework',
     'quickstart',
     'snippets',
-    'app01_认证',
-    'app02_权限',
-    'threatbook',
+    'day01',
+    'threatbook',# 微步接口 demo
 ]
 
 MIDDLEWARE = [
@@ -132,6 +131,11 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # DRF 接口配置
 REST_FRAMEWORK = {
+    "UNAUTHENTICATED_USER": None,
+    "DEFAULT_AUTHENTICATION_CLASSES": ['ext.auth.MyAuthentication',
+                                       'ext.auth.HeaderAuthentication',
+                                       'ext.auth.NoAuthentication',
+    ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5
 }
