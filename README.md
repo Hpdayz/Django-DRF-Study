@@ -203,3 +203,11 @@ class C2(C1):
         4.计算当前记录的数组长度
             - 超过，报错
             - 未超过，可访问
+    使用：
+        -编写类
+            1. 编写类
+            2. 安装django-redis配置 -> settings.py
+            3. 安装django-redis
+            4. 启动redis服务
+        -应用类
+            5. 局部应用
