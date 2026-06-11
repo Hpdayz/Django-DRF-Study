@@ -211,3 +211,13 @@ class C2(C1):
             4. 启动redis服务
         -应用类
             5. 局部应用
+    源码和具体实现：
+        1.对象加载
+            获取每个限流类的对象，初始化（读取限流的配置，获取到 时间间隔+访问次数） --> num_request, duration
+            views.XXXView.as_view() -> rest_framework的as_view() -> django的as_view()
+            找 dispatch -> rest_framework的dispatch() -> self.initial -> self.check_throttles(request)
+        2.allow_request是否限流
+    案例：用户登录 + 用户认证 + 角色 + 扩展案例 + 限流
+        - 无需登录，限流 10/m 
+        - 需要登陆，限流 5/m
+        尝试一下把限流后的错误信息的格式美化，找到哪里抛出 raise —> 覆写

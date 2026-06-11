@@ -146,6 +146,11 @@ REST_FRAMEWORK = {
                                        'ext.auth.HeaderAuthentication',
                                        'ext.auth.NoAuthentication',
     ],
+    # "DEFAULT_PERMISSION_CLASSES": ["ext.per.MyPermission1"],
+    "DEFAULT_THROTTLE_RATES": {
+        "ip": "10/m",
+        "user": "5/m"
+    },
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 5
 }

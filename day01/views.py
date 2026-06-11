@@ -9,13 +9,13 @@ from rest_framework.request import Request
 
 from ext.auth import MyAuthentication, HeaderAuthentication
 from ext.per import MyPermission1, MyPermission2, MyPermission3, UserPermission, BossPermission
-from ext.throttle import MyThrottle
+from ext.throttle import MyThrottle, IPThrottle, UserThrottle
 # 导入数据库模型
 from .models import UserInfo
 
 class LoginView(APIView):
     authentication_classes = []
-    throttle_classes = [MyThrottle]
+    throttle_classes = [IPThrottle]
     def get(self, request):
         return Response('LoginView')
 
@@ -38,6 +38,7 @@ class LoginView(APIView):
 
 class UserView(APIView):
     # authentication_classes = [ MyAuthentication, HeaderAuthentication ]
+    throttle_classes = [UserThrottle]
     def get(self, request):
         print(request.user.role, request.auth)
         return Response('UserView')

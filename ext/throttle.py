@@ -11,3 +11,17 @@ class MyThrottle(SimpleRateThrottle):
         else:
             ident = self.get_ident(request)
         return self.cache_format % {'scope': self.scope, 'ident': ident}
+
+class IPThrottle(SimpleRateThrottle):
+    scope = "ip"
+    cache = default_cache
+    def get_cache_key(self, request, view):
+        ident = self.get_ident(request)
+        return self.cache_format % {'scope': self.scope, 'ident': ident}
+
+class UserThrottle(SimpleRateThrottle):
+    scope = "user"
+    cache = default_cache
+    def get_cache_key(self, request, view):
+        ident = request.user.pk
+        return self.cache_format % {'scope': self.scope, 'ident': ident}
