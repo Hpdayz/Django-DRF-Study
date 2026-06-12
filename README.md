@@ -228,3 +228,16 @@ class C2(C1):
         -getatrribute
         -继承
     3. request封装 + 认证 + 权限 + 限流 => 尽量梳理一份流程图
+
+## day02 - drf 中篇
+    上节内容：前后端分离概述、纯净项目、request对象、认证、权限、限流
+    本节内容：
+     1.版本：在请求中携带版本号，便于后续API的更新迭代
+        -http://www.xxx.com/api/v1/info
+        -http://www.xxx.com/api/v2/info
+     2.解析器：读取不同格式的数据进行解析然后赋值给request.data等对象中
+        user=Hpday&age=24
+        {"user": "Hpday", "age": 24}
+     3.序列化器：将ORM获取的QuerySet或数据对象序列化成JSON格式+请求格式校验
+     4.分页：对ORM获取的的数据进行分页处理，分批发给用户
+     5.视图：def中提供了APIView+其他视图类让我们来继承
