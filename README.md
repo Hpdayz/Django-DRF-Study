@@ -250,7 +250,38 @@ REST_FRAMWORK = {
     "ALLOWED_VERSIONS": [ "v1", "v2", "v3" ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.QueryParameterVersioning"
 }
+path('home/', views.HomeView.as_view(), name='home')
+versioning_class = QueryParameterVersioning
+def get(self,request):
+    print(request.version)
+    print(request.versioning_scheme)
+    # http://127.0.0.1:8000/day02/home/?xx=123
+    url = request.versioning_scheme.reverse("day02:home", request=request)
+    print("反向生成的URL：", url)
+    self.dispatch
+    return Response('HomeView')
 ```
 源码执行流程从 dispatch -> rest_framework.initial -> rest_framework.determine_version ……
 
 ### 1.2 URL路径传递
+```python
+path("api/<str:version>/home/", views.HomeView.as_view()),
+re_path("api/(?P<version>\w+)/home/", views.HomeView.as_view())
+verisoning_class = URLPathVersioning
+def get(self, request, *args, **kwargs):
+    print(request.version)
+    print(request.versioning_scheme)
+    # http://127.0.0.1:8000/day02/api/v1/home/
+    url = request.versioning_scheme.reverse("day02:home", request=request)
+    print("反向生成的URL：", url)
+    return Response('HomeView')
+```
+
+### 1.3请求头传递
+```python
+path("api/home/", views.HomeView.as_view()),
+verisoning_class = AcceptHeaderVersioning
+def get(self, request, *args, **kwargs):
+    print(request.version)
+    return Response('HomeView')
+```
