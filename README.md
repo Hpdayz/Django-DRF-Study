@@ -241,3 +241,16 @@ class C2(C1):
      3.序列化器：将ORM获取的QuerySet或数据对象序列化成JSON格式+请求格式校验
      4.分页：对ORM获取的的数据进行分页处理，分批发给用户
      5.视图：def中提供了APIView+其他视图类让我们来继承
+## 版本
+### 1.1 GET参数传递 - QueryParams
+```python
+REST_FRAMWORK = {
+    "VERSION_PARAM": "xx",
+    "DEFAULT_VERSION": "v1",
+    "ALLOWED_VERSIONS": [ "v1", "v2", "v3" ],
+    "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.QueryParameterVersioning"
+}
+```
+源码执行流程从 dispatch -> rest_framework.initial -> rest_framework.determine_version ……
+
+### 1.2 URL路径传递
