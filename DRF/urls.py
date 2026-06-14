@@ -18,7 +18,7 @@ Including another URLconf
 from django.urls import path, include
 from rest_framework import routers
 
-# 创建子路�?
+# 创建子路由
 router = routers.DefaultRouter()
 urlpatterns = [
     # path('admin/', admin.site.urls),
