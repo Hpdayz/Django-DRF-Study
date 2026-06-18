@@ -245,7 +245,7 @@ class C2(C1):
 ### 1.1 GET参数传递 - QueryParams
 ```python
 REST_FRAMWORK = {
-    "VERSION_PARAM": "xx",
+    "VERSION_PARAM": "xx", # 配置文件 VERSION_PARAM -> 决定请求参数中的变量名
     "DEFAULT_VERSION": "v1",
     "ALLOWED_VERSIONS": [ "v1", "v2", "v3" ],
     "DEFAULT_VERSIONING_CLASS": "rest_framework.versioning.QueryParameterVersioning"
@@ -285,3 +285,32 @@ def get(self, request, *args, **kwargs):
     print(request.version)
     return Response('HomeView')
 ```
+
+## 解析器 - 解析请求者发送过来的数据（JSON）
+```python
+class Form解析器:
+    content-type:"urlencode..."
+    ...
+class JSON解析器:
+    content-type:"application/josn"
+    def parse(self...):
+        ...
+```
+### 请求者
+GET
+    http://127.0.0.1:8000/api/home/?xxx=123
+    请求头
+        ...
+POST
+    http://127.0.0.1:8000/api/home/?xxx=123
+    请求头
+        content-type: "urlencode..."
+        content-type: "application/json"
+    请求体
+        name=xx&age=20                  -> content-type: "urlencode..."
+        {"name": "xxx", "age": "20"}    -> content-type: "application/json"
+1.读取请求头
+2.根据请求头解析数据
+    -根据请求头获取解析器 -> JSON解析器
+    -request.data = JSON解析器.parse
+3.request.dat
