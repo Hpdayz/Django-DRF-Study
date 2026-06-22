@@ -313,4 +313,7 @@ POST
 2.根据请求头解析数据
     -根据请求头获取解析器 -> JSON解析器
     -request.data = JSON解析器.parse
-3.request.dat
+3.request.data
+源码分析：dispatch()->initialize_request()->get_parse_context(){视图对象，URL路由参数}
+        在读request.data的时候会触发解析
+        Request()->__init__()->data()->_load_data_and_files()->_parse
