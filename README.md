@@ -317,3 +317,34 @@ POST
 源码分析：dispatch()->initialize_request()->get_parse_context(){视图对象，URL路由参数}
         在读request.data的时候会触发解析
         Request()->__init__()->data()->_load_data_and_files()->_parse
+文件上传解析器
+```python
+# 仅文件上传
+class UserViewe(APIView):
+    parser_class = [ FileUploadParser, ]
+    def post(self, request, *args, **kwargs):
+        print(request.content_type)
+        print(request.data)
+        file_obj = request.data.get("file")
+        with open(file_obj.name, mode='wb') as f:
+            for chunk in file_obj:
+                f.write(chunk)
+            file_obj.close()
+        return Response('...')
+
+# 数据与文件上传
+class UserViewe(APIView):
+    parser_class = [ MultiPartParser, ]
+    def post(self, request, *args, **kwargs):
+        print(request.content_type)
+        print(request.data)
+        file_obj = request.data.get("img")
+        with open(file_obj.name, mode='wb') as f:
+            for chunk in file_obj:
+                f.write(chunk)
+            file_obj.close()
+        return Response('...')
+```
+默认会有 JSONParser, FormParser, NultiPartParser
+可以定义全局的默认解析器
+"DEFAULT_PARSER_CLASSES": [ 'restframework.parsers.JSONParser', ]
