@@ -378,3 +378,25 @@ class UserViewe(APIView):
                 return 123
         通过MyType创建类，可以在创建类的时候做一些修改 - 参考v5
     -如果类中，或父类中指定了metaclass，当前类和子类均由metaclass创建
+    -扩展
+```python
+class MyType(type):
+    def __new__(cls, name, bases, attrs):
+        print(name, bases, attrs)
+        xx = super().__new__(cls, name, bases, attrs)
+        return xx
+    def __call__(cls, *args, **kwargs):
+        print("执行type的call")
+        obj = cls.__new__(cls, *args, **kwargs)
+        cls.__init__(obj, *args, **kwargs)
+
+class Base(object, metaclass=MyType):
+    def __init__(self):
+        print("初始化")
+    def __new__(cls, *args, **kwargs):
+        print("创建类实例对象")
+        return object.__new__(cls)
+
+# 1.类是由MyType创建出来。 类其实是MyType类实例化的对象
+# 2.Base是类，MyType类的对象：Base()    MyType()()  ->  类实例化出来的对象   对象()
+```
