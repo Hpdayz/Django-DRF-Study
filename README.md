@@ -348,3 +348,33 @@ class UserViewe(APIView):
 默认会有 JSONParser, FormParser, NultiPartParser
 可以定义全局的默认解析器
 "DEFAULT_PARSER_CLASSES": [ 'restframework.parsers.JSONParser', ]
+## 元类
+    -基于类可以实例化对象 类()
+    -type也可以创建类(默认)
+        -默认     type
+            class type:
+                def __init__(self):
+                    在空值初始化数据
+                def __new__(self):
+                    创建->创建类
+            Foo = type("Foo", (object,), {"func": lambda self: 999})
+        -自定义    继承type
+            class MyType(type):
+                pass
+    -如何基于MyType创建类呢？
+        方式1
+        class MyType(type):
+            pass
+        Foo = MyType("Foo", (object,), {"v1": 123, "func": lambda self: 123})
+        方式2
+        class MyType(type):
+            def __new__(cls, *args, **kwargs):
+                xx = super().__new__(cls, *args, **kwargs)
+                print("创建类",xx)
+                return xx
+        class Foo(object, metaclass=MyType):
+            v1 = 123
+            def func(self):
+                return 123
+        通过MyType创建类，可以在创建类的时候做一些修改 - 参考v5
+    -如果类中，或父类中指定了metaclass，当前类和子类均由metaclass创建
