@@ -1,3 +1,5 @@
+import datetime
+
 from django.shortcuts import render
 
 # Create your views here.
@@ -15,9 +17,9 @@ from day02 import models
 from rest_framework import serializers
 
 
-class DepartSerializer(serializers.Serializer):
-    title = serializers.CharField()
-    count = serializers.IntegerField()
+# class DepartSerializer(serializers.Serializer):
+#     title = serializers.CharField()
+#     count = serializers.IntegerField()
 
 
 class DepartSerializer(serializers.ModelSerializer):
@@ -27,19 +29,45 @@ class DepartSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+
 class DepartView(APIView):
     authentication_classes = []
 
     def get(self, request, *args, **kwargs):
         # 1.从数据库中获取数据 {"id": xx, "title": "xx"}
-        depart_obj = models.Depart.objects.all().first()
+        # depart_obj = models.Depart.objects.all().first()
+        depart_obj = models.Depart.objects.all()
+        print(depart_obj)
         # 2.序列化器转换成JSON格式：int/str/list/dict/
         # 如果需要处理的数据是多个，例如[ obj1, obj2, ... ]
         # 可以增加参数 many=True DepartSerializer(instance=depart_obj, many=True)
-        ser = DepartSerializer(instance=depart_obj)
+        ser = DepartSerializer(instance=depart_obj, many=True)
         print(ser.data)
         # 3.返回数据给用户
         context = { "status": 200, "data": ser.data }
+        return Response(context)
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    gender_tetx = serializers.CharField(source="get_gender_display")
+    depart_title = serializers.CharField(source="depart.title")
+    ctime = serializers.DateTimeField(format("%Y-%m-%d"))
+    class Meta:
+        model = models.UserInfo
+        # fields = "__all__"
+        fields = ["name", "age", "gender_tetx", "depart_title", "ctime"]
+
+class UserView(APIView):
+    authentication_classes = []
+    def get(self, request, *args, **kwargs):
+        # models.UserInfo.objects.all().update(ctime=datetime.datetime.now())
+        # 1.获取数据
+        queryset = models.UserInfo.objects.all()
+        # 2.序列化
+        ser_data = UserInfoSerializer(instance=queryset, many=True)
+        # print(ser_data)
+        # 3.返回
+        context = {"status": True, "data": ser_data.data}
         return Response(context)
 
 

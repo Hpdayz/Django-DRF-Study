@@ -408,3 +408,33 @@ class Base(object, metaclass=MyType):
     -数据校验源码
 ### 4.1 序列化
     -Serializer
+        当从数据库中获取多个数据（QuerySet），配置参数： many=True 可以序列化多个数据（QuerySet）`ser = DepartSerializer(instance=depart_obj, many=True)` 
+    -ModelSerializer
+        简化 Serializer ，不必再重写数据库模型对应的字段
+```python
+class DepartSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+```
+    -指定字段显示
+        fields = ["name", "age", "gender"]
+    -获取的是每个字段内部的存储的数据
+        for obj in queryset:
+            obj.name
+            obj.gender
+            ...
+        gender 默认获取整形值，可通过 obj.get_gender_display() 获取内存中的文本值
+    -自定义字段
+```python
+class UserInfoSerializer(serializers.ModelSerializer):
+    # source 指的是数据库的字段
+    gender_text = serializers.CharField(source=get_gender_display)
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender"]
+```
+    -展示外键对应表字段的值
+        depart_title = serializers.CharField(source="depart.title")
+    -时间字段的格式化
+        ctime = serializers.DateTimeField(format="%Y-%m-%d")
