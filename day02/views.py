@@ -10,6 +10,39 @@ from rest_framework.versioning import QueryParameterVersioning, URLPathVersionin
 from rest_framework.parsers import JSONParser, FormParser
 # 导入p
 from rest_framework.negotiation import DefaultContentNegotiation
+
+from day02 import models
+from rest_framework import serializers
+
+
+class DepartSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    count = serializers.IntegerField()
+
+
+class DepartSerializer(serializers.ModelSerializer):
+    # 通过ModelSerializer来简化代码
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+
+
+class DepartView(APIView):
+    authentication_classes = []
+
+    def get(self, request, *args, **kwargs):
+        # 1.从数据库中获取数据 {"id": xx, "title": "xx"}
+        depart_obj = models.Depart.objects.all().first()
+        # 2.序列化器转换成JSON格式：int/str/list/dict/
+        # 如果需要处理的数据是多个，例如[ obj1, obj2, ... ]
+        # 可以增加参数 many=True DepartSerializer(instance=depart_obj, many=True)
+        ser = DepartSerializer(instance=depart_obj)
+        print(ser.data)
+        # 3.返回数据给用户
+        context = { "status": 200, "data": ser.data }
+        return Response(context)
+
+
 class HomeView(APIView):
     authentication_classes = []
     # 配置文件 VERSION_PARAM -> 决定路径参数中的变量名
@@ -19,6 +52,7 @@ class HomeView(APIView):
     parser_classes = [JSONParser, FormParser]
     # 根据请求头，匹配对应的解析器
     content_negotiation_class = DefaultContentNegotiation
+
     def get(self,request, *args, **kwargs):
         print(request.version)
         print(request.versioning_scheme)
@@ -26,6 +60,7 @@ class HomeView(APIView):
         print("反向生成的URL：", url)
         self.dispatch
         return Response('HomeView')
+
     def post(self, request, *args, **kwargs):
         print(request.data, type(request.data))
         return Response("ok")

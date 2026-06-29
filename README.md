@@ -400,3 +400,11 @@ class Base(object, metaclass=MyType):
 # 1.类是由MyType创建出来。 类其实是MyType类实例化的对象
 # 2.Base是类，MyType类的对象：Base()    MyType()()  ->  类实例化出来的对象   对象()
 ```
+## 序列化器(*)
+    -序列化，从数据库获取QuerySet或数据对象 -> JSON
+    -序列化源码流程
+
+    -数据校验
+    -数据校验源码
+### 4.1 序列化
+    -Serializer

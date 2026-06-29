@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     # 'quickstart',
     # 'snippets',
     'day01',
+    'day02',
     'threatbook',# 微步接口 demo
 ]
 
@@ -141,7 +142,7 @@ CACHES = {
 }
 # DRF 接口配置
 REST_FRAMEWORK = {
-    "UNAUTHENTICATED_USER": None, # 解决的是匿名用户登录是触发django 内部使用django.contrib.contenttypes的报错
+    "UNAUTHENTICATED_USER": None, # 解决的是匿名用户登录时触发django 内部使用django.contrib.contenttypes的报错
     "DEFAULT_AUTHENTICATION_CLASSES": ['ext.auth.MyAuthentication',
                                        'ext.auth.HeaderAuthentication',
                                        'ext.auth.NoAuthentication',
