@@ -17,16 +17,16 @@ from day02 import models
 from rest_framework import serializers
 
 
-# class DepartSerializer(serializers.Serializer):
-#     title = serializers.CharField()
-#     count = serializers.IntegerField()
+class DepartSerializer(serializers.Serializer):
+    title = serializers.CharField()
+    count = serializers.IntegerField()
 
 
-class DepartSerializer(serializers.ModelSerializer):
-    # 通过ModelSerializer来简化代码
-    class Meta:
-        model = models.Depart
-        fields = "__all__"
+# class DepartSerializer(serializers.ModelSerializer):
+#     # 通过ModelSerializer来简化代码
+#     class Meta:
+#         model = models.Depart
+#         fields = "__all__"
 
 
 
@@ -48,14 +48,39 @@ class DepartView(APIView):
         return Response(context)
 
 
+class D1(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+
+
+class D2(serializers.ModelSerializer):
+    class Meta:
+        model = models.Tags
+        fields = "__all__"
+
+
 class UserInfoSerializer(serializers.ModelSerializer):
-    gender_tetx = serializers.CharField(source="get_gender_display")
-    depart_title = serializers.CharField(source="depart.title")
-    ctime = serializers.DateTimeField(format("%Y-%m-%d"))
+    # 自定义字段
+    # gender_text = serializers.CharField(source="get_gender_display")
+    # depart_title = serializers.CharField(source="depart.title")
+    # ctime = serializers.DateTimeField(format("%Y-%m-%d"))
+    # # 创建新字段
+    # ccc = serializers.SerializerMethodField()
+
+    # 嵌套
+    depart = D1()
+    tag = D2(many=True)
     class Meta:
         model = models.UserInfo
         # fields = "__all__"
-        fields = ["name", "age", "gender_tetx", "depart_title", "ctime"]
+        # fields = ["name", "age", "gender_text", "depart_title", "ctime", "ccc"]
+        fields = ["depart", "tag"]
+    # def get_ccc(self, obj):
+    #     queryset = obj.tag.all()
+    #     res = [{"id": tag.id, "caption": tag.caption} for tag in queryset]
+    #     print(queryset)
+    #     return res
 
 class UserView(APIView):
     authentication_classes = []

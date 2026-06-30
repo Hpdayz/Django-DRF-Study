@@ -417,15 +417,15 @@ class DepartSerializer(serializers.ModelSerializer):
         model = models.Depart
         fields = "__all__"
 ```
-    -指定字段显示
-        fields = ["name", "age", "gender"]
-    -获取的是每个字段内部的存储的数据
-        for obj in queryset:
-            obj.name
-            obj.gender
-            ...
-        gender 默认获取整形值，可通过 obj.get_gender_display() 获取内存中的文本值
-    -自定义字段
+        -指定字段显示
+            fields = ["name", "age", "gender"]
+        -获取的是每个字段内部的存储的数据
+            for obj in queryset:
+                obj.name
+                obj.gender
+                ...
+            gender 默认获取整形值，可通过 obj.get_gender_display() 获取内存中的文本值
+    -内部字段不够使用，获取字段相关的文本
 ```python
 class UserInfoSerializer(serializers.ModelSerializer):
     # source 指的是数据库的字段
@@ -434,7 +434,70 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = models.UserInfo
         fields = ["name", "age", "gender"]
 ```
-    -展示外键对应表字段的值
-        depart_title = serializers.CharField(source="depart.title")
-    -时间字段的格式化
-        ctime = serializers.DateTimeField(format="%Y-%m-%d")
+        -展示外键对应表字段的值
+            depart_title = serializers.CharField(source="depart.title")
+        -时间字段的格式化 
+            ctime = serializers.DateTimeField(format="%Y-%m-%d")
+    -返回数据模型中不存在的字段，自定义字段
+        使用serializers的SerializerMethodField可以创建models中不存在的字段
+```python
+xxx = serializers.SerializerMethodField()
+Class Meta:
+    ...
+    fields = ["xxx"]
+
+def get_xxx(self, obj):
+    return "xxx"
+```
+    -针对 Foreign Key，ManyToManyField - 嵌套
+        多对多  - 不同人有不同标签
+不使用嵌套的方法
+```python
+class Tags(models.Model):
+    caption = models.CharField(verbose_name="标签", max_length=32)
+
+class UserInfo(models.Model):
+    ...
+    tag = models.ManyToManyField(verbose_name="标签", to=Tags)
+class UserInfoSerializer(serializers.ModelSerializer):
+    xxx = serializers.SerializerMethodField()
+    Class Meta:
+        ...
+        fields = ["xxx"]
+    
+    def get_xxx(self, obj):
+        queryset = obj.tag.all()
+        res = []
+        for tag in queryset:
+            res.append({"id": tag.id, "caption": tag.caption})
+        # 推导式
+        # res = [ {"id": tag.id, "caption": tag.caption} for tag in queryset ]
+        return res
+```
+使用嵌套的方法
+```python
+class D1(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+class D2(serializers.ModelSerializer):
+    class Meta:
+        model = models.Tags
+        fields = "__all__"
+class UserInfoSerializer(serializers.ModelSerializer):
+    # 嵌套
+    depart = D1()
+    tag = D2(many=True)
+    class Meta:
+        model = models.UserInfo
+        fields = ["depart", "tag"]
+```
+    -继承
+```python
+class Base(serializers.ModelSerializer):
+    xx = serializers.CharField(source="name")
+class UserInfoSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "xx"]
+```
