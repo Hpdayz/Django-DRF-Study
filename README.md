@@ -501,3 +501,80 @@ class UserInfoSerializer(serializers.ModelSerializer):
         model = models.UserInfo
         fields = ["name", "xx"]
 ```
+
+
+### 4.2源码概述
+第一步：加载字段
+    # 1.在类成员中删除
+    # 2.汇总到 XXSerializer._declared_fields = { "yy": 对象 }
+    class XXSerializer(serializers.Serializer):
+        yy = serializers.CharField(source="name")
+        name = 123
+    # 1.在类成员中删除
+    # 2.汇总到 XXSerializer._declared_fields = { "yy": 对象, "xx": 对象 }
+    class UserSerializer(serializers.Serializer, XXSerializer):
+        xx = serializers.CharField(source="name")
+        class Meta:
+            model = models.UserInfo
+            fields = ["name", "age", "xx"]
+第二步：序列化
+```python
+# Queryset 列表
+queryset = models.UserInfo.objects.all()
+ser = UserInfoSerializer(instance=queryset, many=True)  # ListSerializer对象 (UserInfoSerializer)对象
+db->queryset = [{"id": xx, "name": "xx"}]               # =>循环queryset中的每一个对象，在调用UserInfoSerializer对它进行实例化
+# 数据对象
+instance = models.UserInfo.objects.all().first()
+ser = UserInfoSerializer(instance=instance)             # UserInfoSerializer对象
+db->instance = {"id": xx, "name": "xx"}                 # =>UserInfoSerializer
+# 两种方式序列化的时候创建出来的不全是UserInfoSerializer对象
+UserSerializer()                                        # __new__  __init__
+```
+    序列化过程
+        db_instance = models.UserInfo.objects.all().first()
+        ser = UserInfoSerializer(instance=db_instance, many=False)
+
+        ser.data    # 触发
+            -内部寻找对应关系
+            -一一进行序列化
+**流程**
+1. 运行django项目，创建字段对象
+```python
+Foo = MyType("Foo", (), {"v1": 123, "v2": 456})
+class Foo(object, metaclass=MyType):
+    v1 = 123
+    v2 = 456
+    def func(self):
+        pass
+class InfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()     # {max_value: 111,      _creation_counter: 0}
+    title = serializers.CharField()     # {allow_blank: False,  _creation_counter: 1}
+    order = serializers.IntegerField()  # {max_value: 111,      _creation_counter: 2}
+```    
+2. 创建类（利用metaclass）
+    class SerializerMetaclass(type):
+        def __new__(cls, name, bases, attrs):
+            data_dict = {}
+            for k,v in list(attrs.items()): # {"v1": 123, "v2": 123 }
+                if isinstance(v,int):
+                    data_dict[k] = attrs.pop(k)
+            attrs['_declared_fields'] = data_dict
+            return super().__new__(cls, name, bases, attrs)
+    class BaseSerializer(object):
+        pass
+    class Serializer(BaseSerializer, metaclass=SerializerMetaclass):
+        pass
+    class InfoSerializer(serializers.Serializer):
+    id = serializers.IntegerField()     # {max_value: 111,      _creation_counter: 0}
+    title = serializers.CharField()     # {allow_blank: False,  _creation_counter: 1}
+    order = serializers.IntegerField()  # {max_value: 111,      _creation_counter: 2}
+   # 当前序列化类中所有的字段对象（父类+自己）
+   InfoSerializer._declared_fields
+   源码分析：SerializerMetaclass
+3. 用户请求到来，数据库获取数据 + 序列化类
+    instance = models.UserInfo.object.all().first()
+    ser = UserSerializer(instance=instance, many=False)   # UserSerializer
+    queryset = models.UserInfo.object.all().first()
+    ser = UserSerializer(instance=instance, many=True)    # 实例化 ListSerializer
+4. 触发序列化 ser.data
+        XXSerializer -> ModelSerializer -> Serializer -> BaseSerializer
