@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.versioning import QueryParameterVersioning, URLPathVersioning
 # 导入解析器
 from rest_framework.parsers import JSONParser, FormParser
-# 导入p
+# 通过请求选择解析器
 from rest_framework.negotiation import DefaultContentNegotiation
 
 from day02 import models

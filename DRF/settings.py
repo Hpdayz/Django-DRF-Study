@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     # 'snippets',
     'day01',
     'day02',
+    'day03',
     'threatbook',# 微步接口 demo
 ]
 
@@ -153,6 +154,6 @@ REST_FRAMEWORK = {
         "user": "5/m"
     },
     "VERSION_PARAM": "xx",
-    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5
+    # 'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE': 5
 }
