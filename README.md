@@ -503,7 +503,8 @@ class UserInfoSerializer(serializers.ModelSerializer):
 ```
 
 
-### 4.2源码概述
+### 4.2源码流程
+**源码概述**
 第一步：加载字段
     # 1.在类成员中删除
     # 2.汇总到 XXSerializer._declared_fields = { "yy": 对象 }
@@ -578,3 +579,32 @@ class InfoSerializer(serializers.Serializer):
     ser = UserSerializer(instance=instance, many=True)    # 实例化 ListSerializer
 4. 触发序列化 ser.data
         XXSerializer -> ModelSerializer -> Serializer -> BaseSerializer
+    many=True 的情况下的
+        XXSerializer -> ListSerializer -> def data() -> super.data() -> BaseSerializer
+
+**任务**
+    - 元类怎么回事？
+    - 序列化器
+        -常见使用
+        -源码流程：画图+分析
+    - 案例：博客平台
+        - 登录&注册 => 提交数据 （数据校验）
+        - 博客列表  => Queryset => 序列化 => many=True
+        - 博客详细  => ORM对象   => 序列化 => many=True
+        - 新建博客
+        - 认证 + 版本
+
+- 序列化
+  - 序列化器的类
+  - 路由 -> 视图 -> 去数据库获取数据对象或queryset -> 序列化器的类转换成列表、字典、有序字典 -> JSON处理
+- 数据校验
+  - 序列化器的类
+  - 路由 -> 视图 -> request.data -> 校验（序列化器的类） -> 操作（db，序列化器的类）
+- 结合
+  创建用户： { "user": "", "password": "" }
+        - 校验 （序列化器的类）
+        - 数据库对象 = 链接数据库保存
+        - 再将新增的数据返回
+            再次调用（序列化器的类），让它将新增的数据 数据库对象 序列化
+            { "user": "", "password" }
+            { "id": 1, "user": "", "password" } + 默认生成的数据
