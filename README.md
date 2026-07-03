@@ -445,7 +445,7 @@ xxx = serializers.SerializerMethodField()
 Class Meta:
     ...
     fields = ["xxx"]
-
+# 序列化钩子函数，用于自定义字段序列化
 def get_xxx(self, obj):
     return "xxx"
 ```
@@ -664,5 +664,60 @@ class DepartView(APIView):
             print(ser.errors)
         # ser.is_valid(raise_exception=True)
 
+        return Response("xxx")
+```
+    -钩子校验
+```python
+from django.core.validators import  RegexValidator, EmailValidator
+class DepartSerializer(serializers.Serializer):
+    title = serializers.CharField(require=True, max_length=20, min_length=6)
+    # 钩子函数
+    def validate_title(self, value):
+        if len(value) > 6:
+            raise exceptions.ValidationError("字段校验失败")
+        return value
+    
+    def validate(self, attrs):
+        print("value=", attrs)
+        # 额外的校验
+        # ...
+        # 支持在settins里配置返回Error的key值
+        # raise exceptions.ValidationError("额外校验失败")
+        return attrs
+```
+    -数据库字段校验
+```python
+class DepartSerializer(serializers.ModelSerializer):
+    more = serializers.CharField(required=True)
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+    # 钩子函数
+    def validate_more(self, value):
+        if len(value) > 6:
+            raise exceptions.ValidationError("字段校验失败")
+        return value
+    
+    def validate(self, attrs):
+        print("value=", attrs)
+        # 额外的校验
+        # ...
+        # 支持在settins里配置返回Error的key值
+        # raise exceptions.ValidationError("额外校验失败")
+        return attrs
+class DepartView(APIView):
+   authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        # 获原始数据
+        print(request.data)
+        #2. 校验
+        ser = DepartSerializer(data=request.data)
+        # if ser.is_valid():
+        #     print(ser.validated_data)
+        # else:
+        #     print(ser.errors)
+        if ser.is_valid(raise_exception=True):
+            del ser.validated_data["more"]
+            ser.save()
         return Response("xxx")
 ```
