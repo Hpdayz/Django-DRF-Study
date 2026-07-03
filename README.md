@@ -608,3 +608,53 @@ class InfoSerializer(serializers.Serializer):
             再次调用（序列化器的类），让它将新增的数据 数据库对象 序列化
             { "user": "", "password" }
             { "id": 1, "user": "", "password" } + 默认生成的数据
+### 数据校验
+    -基本校验 - 对request.data的校验
+```python
+class DepartSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField()
+
+class DepartView(APIView):
+    authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        # 获原始数据
+        print(request.data)
+        #2. 校验
+        ser =DepartSerializer(data=request.data)
+        # if ser.is_valid():
+        #     print(ser.validated_data)
+        # else:
+        #     print(ser.errors)
+        ser.is_valid(raise_exception=True)
+
+        return Response("xxx")
+```
+
+
+    -内置和正则校验
+```python
+from django.core.validators import  RegexValidator, EmailValidator
+class DepartSerializer(serializers.Serializer):
+    title = serializers.CharField(require=True, max_length=20, min_length=6)
+    order = serializers.IntegerField(require=True, max_length=100, min_length=6)
+    level = serializers.ChoiceField(choice=[(1,"高级"), (2,"低级")])
+    email = serializers.EmailField()
+    email = serializers.CharField(validators=[EmailValidator(r"\d+", message="邮箱格式错误")])
+    email = serializers.CharField(validators=[RegexValidator(r"\d+", message="邮箱格式错误")])
+
+class DepartView(APIView):
+    authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        # 获原始数据
+        print(request.data)
+        #2. 校验
+        ser =DepartSerializer(data=request.data)
+        if ser.is_valid():
+            print(ser.validated_data)
+        else:
+            print(ser.errors)
+        # ser.is_valid(raise_exception=True)
+
+        return Response("xxx")
+```
