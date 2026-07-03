@@ -648,7 +648,7 @@ class DepartSerializer(serializers.Serializer):
     order = serializers.IntegerField(require=True, max_length=100, min_length=6)
     level = serializers.ChoiceField(choice=[(1,"高级"), (2,"低级")])
     email = serializers.EmailField()
-    email = serializers.CharField(validators=[EmailValidator(r"\d+", message="邮箱格式错误")])
+    email = serializers.CharField(validators=[EmailValidator(message="邮箱格式错误")])
     email = serializers.CharField(validators=[RegexValidator(r"\d+", message="邮箱格式错误")])
 
 class DepartView(APIView):
