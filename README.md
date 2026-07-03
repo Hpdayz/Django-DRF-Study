@@ -580,9 +580,9 @@ order = serializers.IntegerField()  # {max_value: 111,      _creation_counter: 2
    源码分析：SerializerMetaclass
 3. 用户请求到来，数据库获取数据 + 创建序列化类
 ```python
-instance = models.UserInfo.object.all().first()
+instance = models.UserInfo.objects.all().first()
 ser = UserSerializer(instance=instance, many=False)   # UserSerializer
-queryset = models.UserInfo.object.all().first()
+queryset = models.UserInfo.objects.all().first()
 ser = UserSerializer(instance=instance, many=True)    # 实例化 ListSerializer
 ```
 4. 触发序列化 ser.data
