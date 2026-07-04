@@ -691,7 +691,7 @@ class DepartSerializer(serializers.ModelSerializer):
     more = serializers.CharField(required=True)
     class Meta:
         model = models.Depart
-        fields = "__all__"
+        fields = "__all__"  #  ["xx", "xx", ]
     # 钩子函数
     def validate_more(self, value):
         if len(value) > 6:
@@ -718,6 +718,50 @@ class DepartView(APIView):
         #     print(ser.errors)
         if ser.is_valid(raise_exception=True):
             del ser.validated_data["more"]
-            ser.save()
+            # depart = Depart(**ser.validated_data)  # 将字典解包为模型属性
+            # depart.save()  # 执行数据库 INSERT
+            ser.save() # 简化上述操作
+        return Response("xxx")
+```
+    -Foreign Key 字段校验处理
+        - 如何对 FK 字段做一些自定义的校验
+```python
+from django.core import exceptions
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender", "depart"]
+
+    def validate_depart(self, value):
+        # print(value)
+        if value.id != 1:
+            return value
+        raise exceptions.ValidationError("depart_id 不能为 1 ")
+class UserView(APIView):
+    authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        ser = UserSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response("xxx")
+```
+    -ManyToMany 字段校验
+```python
+from django.core import exceptions
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender", "tag"]
+
+    def validate_tag(self, value):
+        print(value, type(value)) # [list]
+        return value
+
+class UserView(APIView):
+    authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        ser = UserSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
         return Response("xxx")
 ```

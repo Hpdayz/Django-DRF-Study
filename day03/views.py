@@ -10,30 +10,9 @@ from rest_framework.response import Response
 from day02 import models
 from rest_framework import serializers
 
-class UserInfoSerializer(serializers.ModelSerializer):
-    # 自定义字段
-    # gender_text = serializers.CharField(source="get_gender_display")
-    title = serializers.CharField()
-    order = serializers.IntegerField()
+from day03 import models
 
-
-    class Meta:
-        model = models.Depart
-        fields = [ "title", "order"]
-
-class UserView(APIView):
-    authentication_classes = []
-    def get(self, request, *args, **kwargs):
-        # models.UserInfo.objects.all().update(ctime=datetime.datetime.now())
-        # 1.获取数据
-        queryset = models.Depart.objects.all()
-        # 2.序列化
-        ser_data = UserInfoSerializer(instance=queryset, many=True)
-        # print(ser_data)
-        # 3.返回
-        context = {"status": True, "data": ser_data.data}
-        return Response(context)
-        # return  Response('xxx')
+from django.core import exceptions
 
 class DepartSerializer(serializers.Serializer):
     username = serializers.CharField()
@@ -53,3 +32,22 @@ class DepartView(APIView):
         ser.is_valid(raise_exception=True)
 
         return Response("xxx")
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender", "depart"]
+
+    def validate_depart(self, value):
+         if value.id > 1:
+             return value
+         raise exceptions.ValidationError("depart_id 不可以是 1")
+
+class UserView(APIView):
+    authentication_classes = []
+    def post(self, request, *args, **kwargs):
+        ser = UserSerializer(data=request.data)
+        ser.is_valid(raise_exception=True)
+        ser.save()
+        return Response("xxx")
+
