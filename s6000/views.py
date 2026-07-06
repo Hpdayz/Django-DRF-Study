@@ -154,7 +154,6 @@ def intelligence_gc(request):
     # -- 读缓存 --
     if use_cache:
         try:
-            global _redis_client
             if _redis_client is None:
                 _redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
             cached = _redis_client.get("s6000:intelligence:{}".format(ip))
@@ -207,7 +206,7 @@ def intelligence_gc(request):
     # -- 成功才写缓存 --
     if data.get("code") == 200:
         try:
-            global _redis_client
+
             if _redis_client is None:
                 _redis_client = redis.Redis.from_url(REDIS_URL, decode_responses=True)
             _redis_client.setex(
