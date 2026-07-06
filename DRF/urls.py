@@ -15,10 +15,10 @@ Including another URLconf
 """
 # from django.contrib import admin
 
-from django.urls import path, include
+from django.urls import include, path
 from rest_framework import routers
 
-# 创建子路由
+# 创建子路�?
 router = routers.DefaultRouter()
 urlpatterns = [
     # path('admin/', admin.site.urls),
@@ -29,5 +29,6 @@ urlpatterns = [
     # path('api-auth', include('rest_framework.urls', namespace='rest_framework')),
     # path('', include('snippets.urls', namespace='Snippets')),
     path('', include('threatbook.urls', namespace='threatbook')),
+    path('', include('s6000.urls', namespace='s6000')),
 ]
 
