@@ -7,7 +7,7 @@ import json
 
 import redis
 import requests
-from rest_framework import permissions, status
+from rest_framework import permissions
 from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.response import Response
 
@@ -44,15 +44,21 @@ def _cache_key(ip):
 def intelligence(request):
     ip = request.data.get('ip')
     if not ip:
-        return Response(
-            {'code': 400, 'msg': 'ip missing'},
-            status=status.HTTP_400_BAD_REQUEST,
-        )
+        return Response({
+            'code': 10400,
+            'data': None,
+            'message': 'ip 参数缺失',
+        })
 
     try:
         cached = _get_redis().get(_cache_key(ip))
         if cached is not None:
-            return Response(json.loads(cached))
+            data = json.loads(cached)
+            return Response({
+                'code': 10200,
+                'data': data,
+                'message': 'success',
+            })
     except redis.RedisError:
         pass
 
@@ -61,10 +67,11 @@ def intelligence(request):
         secret_key = _get_config('secretKey')
         base_url = _get_config('baseUrl')
     except ValueError as e:
-        return Response(
-            {'code': 500, 'msg': str(e)},
-            status=status.HTTP_500_INTERNAL_SERVER_ERROR,
-        )
+        return Response({
+            'code': 10400,
+            'data': None,
+            'message': '配置缺失: {}'.format(e),
+        })
 
     timestamp = generate_timestamp()
     authorization = build_authorization(app_code, secret_key, timestamp)
@@ -79,20 +86,25 @@ def intelligence(request):
     try:
         resp = requests.post(url, json={'ip': ip}, headers=headers, timeout=15)
         resp.raise_for_status()
-        data = resp.json()
+        raw = resp.json()
     except requests.RequestException as e:
-        return Response(
-            {'code': 502, 'msg': 'API call failed: {}'.format(e)},
-            status=status.HTTP_502_BAD_GATEWAY,
-        )
+        return Response({
+            'code': 10400,
+            'data': None,
+            'message': '接口调用失败: {}'.format(e),
+        })
 
-    if data.get('code') == 200:
+    if raw.get('code') == 200:
         try:
             _get_redis().setex(
                 _cache_key(ip), CACHE_TTL,
-                json.dumps(data, ensure_ascii=False),
+                json.dumps(raw, ensure_ascii=False),
             )
         except redis.RedisError:
             pass
 
-    return Response(data)
+    return Response({
+        'code': 10200,
+        'data': raw,
+        'message': 'success',
+    })
