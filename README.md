@@ -745,6 +745,15 @@ class UserView(APIView):
         ser.save()
         return Response("xxx")
 ```
+        -FK的id问题
+        Foreign Key 在 Django 里会默认加上 _id 后缀。 depart => depart_id
+        ModelSerializers 映射的是 models() 模型字段中的 depart 
+```python
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.UserInfo
+        fields = ["depart_id"]  # 会报错
+```
     -ManyToMany 字段校验
 ```python
 from django.core import exceptions
@@ -765,3 +774,10 @@ class UserView(APIView):
         ser.save()
         return Response("xxx")
 ```
+    -流程
+        1.自定义 Serializer + 字段
+        2.自定义 Serializer + 字段（内置 + 正则）
+        3.自定义 Serializer + 字段（内置 + 正则） + 字段钩子 + 全局钩子
+        4.自定义 ModelSerializer + extra_kwargs + save（多的：pop， 少的：save参数）
+        5.自定义 ModelSerializer + FK => 自动获取关联数据 depart => depart_id
+        6.自定义 ModelSerializer + M2M => 自动获取关联数据 ListField或DictField + 钩子

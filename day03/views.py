@@ -36,18 +36,19 @@ class DepartView(APIView):
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.UserInfo
-        fields = ["name", "age", "gender", "depart"]
+        fields = ["name", "age", "gender", "depart_id"]
 
-    def validate_depart(self, value):
-         if value.id > 1:
-             return value
-         raise exceptions.ValidationError("depart_id 不可以是 1")
+    # def validate_depart(self, value):
+    #      if value.id > 1:
+    #          return value
+    #      raise exceptions.ValidationError("depart_id 不可以是 1")
 
 class UserView(APIView):
     authentication_classes = []
     def post(self, request, *args, **kwargs):
         ser = UserSerializer(data=request.data)
         ser.is_valid(raise_exception=True)
+        print("视图：", ser.validated_data)
         ser.save()
         return Response("xxx")
 
