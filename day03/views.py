@@ -52,3 +52,36 @@ class UserView(APIView):
         ser.save()
         return Response("xxx")
 
+class Dp1Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+
+class Dp2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = ["title", "count"]
+
+class DpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = ["id", "title", "order", "count"]
+        extra_kwargs = {
+            "id": { "read_only": True}, # 仅序列化
+            "count": {"write_only": True} # 仅校验
+        }
+class DpView(APIView):
+    authentication_classes = []
+    # 同时 序列化 + 校验
+    def post(self, request, *args, **kwargs):
+        ser = DpSerializer(data=request.data)
+        if ser.is_valid():
+            instance =  ser.save()
+            print(instance, type(instance))
+            cc =  DpSerializer(instance=instance)
+            return Response(cc.data)
+        else:
+            return Response("错误")
+
+
+

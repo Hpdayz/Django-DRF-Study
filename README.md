@@ -781,3 +781,144 @@ class UserView(APIView):
         4.自定义 ModelSerializer + extra_kwargs + save（多的：pop， 少的：save参数）
         5.自定义 ModelSerializer + FK => 自动获取关联数据 depart => depart_id
         6.自定义 ModelSerializer + M2M => 自动获取关联数据 ListField或DictField + 钩子
+        7.save 的返回值
+            instance = ser.save()
+            instance.name
+            instance.age
+            instance.gender
+        8.序列化返回
+            校验Serializer + 序列化Serializer
+```python
+class Dp1Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+
+class Dp2Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = ["title", "count"]
+class DpView(APIView):
+    authentication_classes = []
+    # 同时 序列化 + 校验
+    def post(self, request, *args, **kwargs):
+        ser = Dp1Serializer(data=request.data)
+        if ser.is_valid():
+            instance =  ser.save()
+            print(instance, type(instance))
+            cc =  Dp2Serializer(instance=instance)
+            return Response(cc.data)
+        else:
+            return Response("错误")
+```
+            校验 和 序列化 使用同一个 Serializer
+```python
+class Dp1Serializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+
+class DpView(APIView):
+    authentication_classes = []
+    # 同时 序列化 + 校验
+    def post(self, request, *args, **kwargs):
+        ser = Dp1Serializer(data=request.data)
+        if ser.is_valid():
+            instance =  ser.save()
+            print(instance, type(instance))
+            cc =  Dp1Serializer(instance=instance)
+            return Response(cc.data)
+        else:
+            return Response("错误")
+```
+            使用同一个 Serializer 如何序列化规定的字段
+                read_only=True  # 序列化
+                write_only=True # 校验
+```python
+class DpSerializer(serializers.ModelSerializer):
+    title = serializers.CharField(write_only=True)
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+
+# 使用 extra_kwargs 写法
+class DpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = ["id", "title", "order", "count"]
+        extra_kwargs = {
+            "id": { "read_only": True},
+            "count": {"write_only": True}
+        }
+```
+            针对 Choice 字段，如何将 “男” "女" 通过序列化返回
+gender = models.SmallIntegerField(verbose_name="性别", choices=((1, "男"), (2, "女")))
+```python
+class DpSerializer(serializers.ModelSerializer):
+    gender_info = serializers.CharField(source="get_gender_display")
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender", "depart"]
+
+# 第二种方式
+class DpSerializer(serializers.ModelSerializer):
+    vv = serializers.SerializerMethodField()
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender", "depart"]
+    def get_vv(self, value):
+        return { "text": value.get_gender_display}
+```
+            针对 FK M2M
+```python
+class P1ModelSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+class DpSerializer(serializers.ModelSerializer):
+    # 需要加上 read_only = True 否则会对该字段进行校验
+    # xx = serializers.CharField(source="depart.title",read_only=True)
+    # 第二种方式 - 使用 继承
+    v1 = P1ModelSerializer(read_only=True, source="depart")
+    class Meta:
+        model = models.UserInfo
+        fields = ["name", "age", "gender", "depart"]
+        extra_kwargs = {
+            "name": { "read_only": True},
+            "gender": {"write_only": True}
+        }
+```
+    当使用同一个序列化器的时候 校验 + 序列化
+```python
+class DpSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Depart
+        fields = "__all__"
+        extra_kwargs = {
+            "id": { "read_only": True},
+            "count": {"write_only": True}
+        }
+
+class DpView(APIView):
+    authentication_classes = []
+    # 同时 序列化 + 校验
+    def post(self, request, *args, **kwargs):
+        ser = DpSerializer(data=request.data)
+        if ser.is_valid():
+            ser.save()
+            return Response(ser.data)
+        else:
+            return Response("错误")
+```
+
+
+
+
+
+
+
+
+
+
+
+
