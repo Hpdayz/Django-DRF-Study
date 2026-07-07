@@ -28,7 +28,7 @@ urlpatterns = [
     path('day03/', include('day03.urls', namespace='day03')),
     # path('api-auth', include('rest_framework.urls', namespace='rest_framework')),
     # path('', include('snippets.urls', namespace='Snippets')),
-    path('', include('threatbook.urls', namespace='threatbook')),
+    # path('', include('threatbook.urls', namespace='threatbook')),  # 微步接口也做停用，保留代码
     # path('', include('s6000.urls', namespace='s6000')),  # s6000 模块已停用，代码保留
 ]
 

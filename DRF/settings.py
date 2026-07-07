@@ -43,8 +43,8 @@ INSTALLED_APPS = [
     'day01',
     'day02',
     'day03',
-    'threatbook'
-    # 's6000',  # S6000 接口代理# 微步接口 demo
+    # 'threatbook'# 微步接口 demo
+    # 's6000',  # S6000 接口代理
 ]
 
 MIDDLEWARE = [
